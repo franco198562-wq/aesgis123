@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Staff Login — The Aegis Institute</title>
+
+  <link
+    rel="stylesheet"
+    href="/portal.css"
+  >
+</head>
+
+<body class="portal-login-page">
+
+  <main class="login-shell">
+
+    <section class="login-card">
+
+      <div class="login-brand">
+
+        <div class="login-logo">
+          A
+        </div>
+
+        <div>
+          <div class="login-brand-name">
+            THE AEGIS INSTITUTE
+          </div>
+
+          <div class="login-brand-subtitle">
+            Staff Portal
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="login-heading">
+
+        <span class="eyebrow">
+          SECURE ACCESS
+        </span>
+
+        <h1>
+          Staff Login
+        </h1>
+
+        <p>
+          Sign in using your administrator password
+          or your assigned staff access code.
+        </p>
+
+      </div>
+
+
+      <!-- ERROR -->
+
+      <div
+        id="loginError"
+        class="login-error"
+        hidden
+      ></div>
+
+
+      <!-- MAIN ADMIN LOGIN -->
+
+      <form
+        id="passwordForm"
+        class="login-form"
+      >
+
+        <label for="password">
+          Administrator Password
+        </label>
+
+        <div class="password-field">
+
+          <input
+            id="password"
+            name="password"
+            type="password"
+            placeholder="Enter administrator password"
+            autocomplete="current-password"
+            required
+          >
+
+          <button
+            type="button"
+            id="togglePassword"
+            class="password-toggle"
+            aria-label="Show password"
+          >
+            Show
+          </button>
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="login-submit"
+          id="passwordSubmit"
+        >
+          Sign in as Administrator
+        </button>
+
+      </form>
+
+
+      <div class="login-divider">
+        <span>OR</span>
+      </div>
+
+
+      <!-- STAFF CODE LOGIN -->
+
+      <form
+        id="codeForm"
+        class="login-form"
+      >
+
+        <label for="staffCode">
+          Staff Access Code
+        </label>
+
+        <input
+          id="staffCode"
+          name="code"
+          type="text"
+          placeholder="XXXXX-XXXXX"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          maxlength="11"
+          required
+        >
+
+        <button
+          type="submit"
+          class="login-submit login-submit-secondary"
+          id="codeSubmit"
+        >
+          Sign in with Staff Code
+        </button>
+
+      </form>
+
+
+      <div class="login-footer">
+
+        <a href="/">
+          ← Return to website
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <div class="login-bottom">
+
+      <span>
+        Protected staff area
+      </span>
+
+      <span>
+        © The Aegis Institute
+      </span>
+
+    </div>
+
+  </main>
+
+
+  <script>
+
+    const passwordForm =
+      document.getElementById(
+        "passwordForm"
+      );
+
+    const codeForm =
+      document.getElementById(
+        "codeForm"
+      );
+
+    const passwordInput =
+      document.getElementById(
+        "password"
+      );
+
+    const staffCodeInput =
+      document.getElementById(
+        "staffCode"
+      );
+
+    const passwordSubmit =
+      document.getElementById(
+        "passwordSubmit"
+      );
+
+    const codeSubmit =
+      document.getElementById(
+        "codeSubmit"
+      );
+
+    const loginError =
+      document.getElementById(
+        "loginError"
+      );
+
+    const togglePassword =
+      document.getElementById(
+        "togglePassword"
+      );
+
+
+    /*
+      Check whether the user is
+      already logged in.
+    */
+
+    async function checkExistingSession() {
+
+      try {
+
+        const response =
+          await fetch(
+            "/api/auth/me",
+            {
+              method: "GET",
+              credentials: "same-origin",
+              cache: "no-store"
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          data &&
+          data.authenticated
+        ) {
+
+          if (
+            data.type === "main"
+          ) {
+
+            window.location.href =
+              "/admin.html";
+
+          } else {
+
+            window.location.href =
+              "/staff.html";
+
+          }
+
+        }
+
+      } catch {
+
+        /*
+          If the check fails,
+          simply allow login.
+        */
+
+      }
+
+    }
+
+
+    /*
+      Display an error.
+    */
+
+    function showError(message) {
+
+      loginError.textContent =
+        message;
+
+      loginError.hidden =
+        false;
+
+    }
+
+
+    /*
+      Hide the error.
+    */
+
+    function hideError() {
+
+      loginError.hidden =
+        true;
+
+      loginError.textContent =
+        "";
+
+    }
+
+
+    /*
+      Set loading state.
+    */
+
+    function setLoading(
+      button,
+      loading,
+      normalText
+    ) {
+
+      button.disabled =
+        loading;
+
+      button.textContent =
+        loading
+          ? "Signing in..."
+          : normalText;
+
+    }
+
+
+    /*
+      Administrator password login.
+    */
+
+    passwordForm.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+        hideError();
+
+        const password =
+          passwordInput.value;
+
+        if (!password) {
+
+          showError(
+            "Please enter your administrator password."
+          );
+
+          return;
+
+        }
+
+        setLoading(
+          passwordSubmit,
+          true,
+          "Sign in as Administrator"
+        );
+
+        try {
+
+          const response =
+            await fetch(
+              "/api/auth/login",
+              {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+                body:
+                  JSON.stringify({
+                    password
+                  })
+              }
+            );
+
+          const data =
+            await response.json();
+
+          if (
+            !response.ok ||
+            !data.ok
+          ) {
+
+            throw new Error(
+              data.error ||
+              "Login failed."
+            );
+
+          }
+
+          window.location.href =
+            data.redirect ||
+            "/admin.html";
+
+        } catch (error) {
+
+          showError(
+            error.message ||
+            "Unable to sign in."
+          );
+
+          setLoading(
+            passwordSubmit,
+            false,
+            "Sign in as Administrator"
+          );
+
+        }
+
+      }
+    );
+
+
+    /*
+      Staff code login.
+    */
+
+    codeForm.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+        hideError();
+
+        const code =
+          staffCodeInput.value
+            .trim()
+            .toUpperCase();
+
+        if (!code) {
+
+          showError(
+            "Please enter your staff access code."
+          );
+
+          return;
+
+        }
+
+        setLoading(
+          codeSubmit,
+          true,
+          "Sign in with Staff Code"
+        );
+
+        try {
+
+          const response =
+            await fetch(
+              "/api/auth/login",
+              {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+                body:
+                  JSON.stringify({
+                    code
+                  })
+              }
+            );
+
+          const data =
+            await response.json();
+
+          if (
+            !response.ok ||
+            !data.ok
+          ) {
+
+            throw new Error(
+              data.error ||
+              "Login failed."
+            );
+
+          }
+
+          window.location.href =
+            data.redirect ||
+            "/staff.html";
+
+        } catch (error) {
+
+          showError(
+            error.message ||
+            "Unable to sign in."
+          );
+
+          setLoading(
+            codeSubmit,
+            false,
+            "Sign in with Staff Code"
+          );
+
+        }
+
+      }
+    );
+
+
+    /*
+      Show/hide administrator password.
+    */
+
+    togglePassword.addEventListener(
+      "click",
+      function() {
+
+        const showing =
+          passwordInput.type ===
+          "text";
+
+        passwordInput.type =
+          showing
+            ? "password"
+            : "text";
+
+        togglePassword.textContent =
+          showing
+            ? "Show"
+            : "Hide";
+
+        togglePassword.setAttribute(
+          "aria-label",
+          showing
+            ? "Show password"
+            : "Hide password"
+        );
+
+      }
+    );
+
+
+    /*
+      Automatically format staff code.
+      Example:
+      ABCDEFGHIJ
+      ->
+      ABCDE-FGHIJ
+    */
+
+    staffCodeInput.addEventListener(
+      "input",
+      function() {
+
+        let value =
+          staffCodeInput.value
+            .toUpperCase()
+            .replace(
+              /[^A-Z0-9]/g,
+              ""
+            );
+
+        if (
+          value.length > 5
+        ) {
+
+          value =
+            value.slice(0, 5) +
+            "-" +
+            value.slice(5, 10);
+
+        }
+
+        staffCodeInput.value =
+          value;
+
+      }
+    );
+
+
+    /*
+      Start.
+    */
+
+    checkExistingSession();
+
+  </script>
+
+</body>
+</html>

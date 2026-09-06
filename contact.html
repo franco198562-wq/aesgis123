@@ -1,0 +1,246 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Contact — The Aegis Institute</title>
+
+  <link rel="stylesheet" href="/styles.css">
+
+</head>
+
+<body>
+
+<header class="site-header">
+
+  <a href="/" class="brand">
+    <img
+      class="brand-logo"
+      src="https://cdn.discordapp.com/emojis/1481802757005508700.png"
+      alt="The Aegis Institute logo"
+    >
+
+    <span class="brand-text">
+      <strong>THE AEGIS INSTITUTE</strong>
+    </span>
+  </a>
+
+  <nav class="main-nav">
+    <a href="/">Home</a>
+    <a href="/services.html">Services</a>
+    <a href="/work.html">Our Work</a>
+    <a href="/contact.html" class="active">Contact</a>
+
+    <a href="/api/auth/discord" class="staff-login">
+      Staff Login
+    </a>
+  </nav>
+
+</header>
+
+
+<main>
+
+  <section class="contact-hero">
+
+    <div class="container">
+
+      <span class="eyebrow">
+        CONTACT
+      </span>
+
+      <h1>
+        Let's talk about what your community needs.
+      </h1>
+
+      <p>
+        Have a question, project idea, or training requirement?
+        Send a message and the Aegis team can help.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <section class="section contact-section">
+
+    <div class="container contact-grid">
+
+      <div class="contact-form-card">
+
+        <h2>
+          Send an enquiry
+        </h2>
+
+        <form id="contactForm">
+
+          <label>
+            Name
+            <input
+              type="text"
+              id="contactName"
+              placeholder="Your name"
+              required
+            >
+          </label>
+
+
+          <label>
+            Email
+            <input
+              type="email"
+              id="contactEmail"
+              placeholder="you@example.com"
+              required
+            >
+          </label>
+
+
+          <label>
+            Message
+            <textarea
+              id="contactMessage"
+              placeholder="Tell us what you need help with..."
+              required
+            ></textarea>
+          </label>
+
+
+          <button
+            type="submit"
+            class="button button-primary"
+          >
+            Send Enquiry
+          </button>
+
+        </form>
+
+        <p id="contactStatus" class="form-status"></p>
+
+      </div>
+
+
+      <div class="contact-side">
+
+        <article class="side-contact-card">
+
+          <span class="card-label">
+            CONSULTING
+          </span>
+
+          <h3>
+            Community support
+          </h3>
+
+          <p>
+            For audits, standards, systems and
+            staff-development projects.
+          </p>
+
+        </article>
+
+
+        <article class="side-contact-card">
+
+          <span class="card-label">
+            EDUCATION
+          </span>
+
+          <h3>
+            Training enquiries
+          </h3>
+
+          <p>
+            For individual learning or outsourced
+            server training.
+          </p>
+
+        </article>
+
+
+        <article class="side-contact-card">
+
+          <span class="card-label">
+            COMMUNITY
+          </span>
+
+          <h3>
+            General enquiries
+          </h3>
+
+          <p>
+            Have something else in mind?
+            Get in touch and we'll point you in the right direction.
+          </p>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<footer class="site-footer">
+
+  <div class="container footer-inner">
+    <span>© 2026 The Aegis Institute</span>
+    <span>Education · Consulting · Community</span>
+  </div>
+
+</footer>
+
+
+<script>
+  const contactForm = document.getElementById("contactForm");
+  const contactStatus = document.getElementById("contactStatus");
+
+  contactForm.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const name = document.getElementById("contactName").value.trim();
+    const email = document.getElementById("contactEmail").value.trim();
+    const message = document.getElementById("contactMessage").value.trim();
+
+    if (!name || !email || !message) {
+      contactStatus.textContent = "Please complete all fields.";
+      return;
+    }
+
+    const recipient = "technical@aegisinsitute.cc";
+
+    const subject = encodeURIComponent(
+      "New Enquiry — The Aegis Institute"
+    );
+
+    const body = encodeURIComponent(
+      "New enquiry received through The Aegis Institute website.\n\n" +
+      "Name: " + name + "\n" +
+      "Email: " + email + "\n\n" +
+      "Message:\n" +
+      message
+    );
+
+    const mailtoLink =
+      "mailto:" + recipient +
+      "?subject=" + subject +
+      "&body=" + body;
+
+    window.location.href = mailtoLink;
+
+    contactStatus.textContent =
+      "Opening your email application...";
+  });
+</script>
+
+</body>
+</html>
+```
